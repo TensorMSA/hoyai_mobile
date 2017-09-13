@@ -4,12 +4,12 @@ $(document).ready(function() {
 });
 
 var myBotApp = {
-    ajaxServiceUrl: "http://52.78.20.54:8000",
+    ajaxServiceUrl: "http://localhost.96:8000",
     ajaxRequestMessageMethod: "PUT",
     ajaxRequestMessageApiPath: "/api/v1/type/service/chatbot/cb0001/",
     fileTranferImageUploadApiPath: "/",
     langMap: {
-        headerTitle: "테스트봇 (POSCO ICT)",
+        headerTitle: "AI 테스트봇",
         startMsg : "안녕하세요, 테스트봇입니다.<br>무엇을 도와드릴까요?",
         textNotUnderstandMsg : "무슨 말씀인지 이해할 수 없어요.",
         imageNotUnderstandMsg : "무슨 사진인지 이해할 수 없어요.",
@@ -19,19 +19,19 @@ var myBotApp = {
         hideDetailInfoBtn : "감추기"
     },
     bufferResponseMsg: {
-        unique_id : "1111",
-        package_id : "abcd",
+
         intent_id : "",
-        edit_history : {},
+        edit_history : [],
         input_data : "",
         convert_data : "",
         intent_history : [],
         request_type : "text",
-        service_type : "I",
+        service_type : "",
         story_board_id : "",
-        story_key_entity : {},
+        story_key_entity : [],
         story_slot_entity : {},
-        output_data : ":"
+        output_data : ""    
+
     },
     initialize: function() {
         var me = this;
@@ -186,8 +186,9 @@ var myBotApp = {
         tempMessage.request_type = hoyaiRequestType;
         tempMessage.input_data = inputData;
         tempMessage.output_data = "";
+        console.log(tempMessage)
 
-        var params = JSON.stringify(tempMessage)
+        var params = JSON.stringify(tempMessage);
         $.ajax({
             type: me.ajaxRequestMessageMethod,
             url: me.ajaxServiceUrl + me.ajaxRequestMessageApiPath,
@@ -196,7 +197,8 @@ var myBotApp = {
             async: true,
             data: params,
             success: function (data, status, jqXhr) {
-                var retData = JSON.parse(data);
+		var retData = data;
+                //var retData = JSON.parse(data);
                 if(typeof retData != 'object') retData = JSON.parse(eval(data));
 
                 me.bufferResponseMsg = retData;
