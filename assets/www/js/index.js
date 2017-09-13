@@ -28,6 +28,7 @@ var app = {
     // 'pause', 'resume', etc.
     onDeviceReady: function() {
         this.receivedEvent('deviceready');
+        document.addEventListener("backbutton", onBackKeyDown, false);
     },
 
     // Update DOM on a Received Event

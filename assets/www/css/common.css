@@ -335,7 +335,11 @@ input[type="search"]::-webkit-search-results-decoration {
     border: 5px solid #ccccff;
     position: relative;
     width: 200px;
-    height: 200px;
+    height: 320px;
+
+   background-repeat: no-repeat;
+   background-position: center center;
+   background-size: 200px 320px;
 }
 .myPicture:after {
     content: '';
@@ -368,7 +372,7 @@ input[type="search"]::-webkit-search-results-decoration {
 
 .resultImage {
     width: 200px;
-    height: 200px;
+    height: 320px;
     border-radius: 10px;
 }
 

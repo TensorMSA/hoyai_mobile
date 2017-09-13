@@ -1,15 +1,15 @@
-/*
 $(document).ready(function() {
     myBotApp.initialize();
     myBotApp.start();
 });
-*/
 
 var myBotApp = {
+    ajaxServiceUrl: "http://52.78.20.54:8000",
     ajaxRequestMessageMethod: "PUT",
-    ajaxRequestMessageUrl: "http://52.79.201.93:8000/api/v1/type/service/chatbot/2222/",
-    fileTranferImageUploadUrl: "http://127.0.0.1/",
+    ajaxRequestMessageApiPath: "/api/v1/type/service/chatbot/cb0001/",
+    fileTranferImageUploadApiPath: "/",
     langMap: {
+        headerTitle: "테스트봇 (POSCO ICT)",
         startMsg : "안녕하세요, 테스트봇입니다.<br>무엇을 도와드릴까요?",
         textNotUnderstandMsg : "무슨 말씀인지 이해할 수 없어요.",
         imageNotUnderstandMsg : "무슨 사진인지 이해할 수 없어요.",
@@ -22,23 +22,22 @@ var myBotApp = {
         unique_id : "1111",
         package_id : "abcd",
         intent_id : "",
-        intent_name : "",
+        edit_history : {},
         input_data : "",
         convert_data : "",
         intent_history : [],
-        request_type : "",
-        service_type : "",
+        request_type : "text",
+        service_type : "I",
         story_board_id : "",
-        story_req_entity : {},
-        story_set_entity : {},
-        opt_sel_list : {},
-        ontology_id : "",
-        ontology_req_parms : {},
-        ontology_set_parms : {},
-        output_data : ""
+        story_key_entity : {},
+        story_slot_entity : {},
+        output_data : ":"
     },
     initialize: function() {
         var me = this;
+
+        $("#chatBotHeaderTitle").html(me.langMap.headerTitle + " - " + me.ajaxServiceUrl);
+
         $("#inputMessage").keypress(function( event ) {
             if ( event.which == 13 ) {
                 me.sendMessage();
@@ -81,8 +80,8 @@ var myBotApp = {
             mediaType: Camera.MediaType.PICTURE,
             allowEdit: true,
             correctOrientation: true,
-            targetHeight : 200,
-            targetWidth : 200
+            targetWidth : 200,
+            targetHeight : 320
         };
         navigator.camera.getPicture(function cameraSuccess(imageUri) {
             me.sendImage(imageUri);
@@ -112,7 +111,7 @@ var myBotApp = {
 
         ft.upload(
             imageUri,
-            encodeURI(me.fileTranferImageUploadUrl),
+            encodeURI(me.ajaxServiceUrl +  me.fileTranferImageUploadApiPath),
             function win(r) {
                 console.log("Code = " + r.responseCode);
                 console.log("Response = " + r.response);
@@ -166,9 +165,7 @@ var myBotApp = {
 
         // MY MESSAGE : LOCAL
         innerHTML = $("<div>").addClass("messageRow");
-        innerHTML.append($("<div>").addClass("myPicture").css({"background":"url(data:image/png;base64," + imageUrl + ")",
-                                                               "background-repeat":"no-repeat", "background-position":"center center",
-                                                               "background-size":"200px 200px"}));
+        innerHTML.append($("<div>").addClass("myPicture").css("background", "url(data:image/png;base64," + imageUrl + ")"));
         $("#chatBotWindowMain").append(innerHTML);
         $("#chatBotWindowMain").scrollTop($("#chatBotWindowMain").prop("scrollHeight"));
 
@@ -193,19 +190,21 @@ var myBotApp = {
         var params = JSON.stringify(tempMessage)
         $.ajax({
             type: me.ajaxRequestMessageMethod,
-            url: me.ajaxRequestMessageUrl,
+            url: me.ajaxServiceUrl + me.ajaxRequestMessageApiPath,
             contentType : "application/json",
-            timeout: 3000,
+            timeout: 50000,
             async: true,
             data: params,
             success: function (data, status, jqXhr) {
-                var retData = JSON.parse(eval(data));
+                var retData = JSON.parse(data);
+                if(typeof retData != 'object') retData = JSON.parse(eval(data));
+
                 me.bufferResponseMsg = retData;
 
                 innerElement.find(".otherMessageLoading").remove();
-
+                console.log(retData);
                 var btnDetailInfo = $("<button>").addClass("btnDetailInfo").html(me.langMap.showDetailInfoBtn);
-                innerElement.find(".otherMessage").html((retData.output_data.length > 0 ? retData.output_data : me.langMap.apiCallEmptyResultMsg)).append(btnDetailInfo).show();
+                innerElement.find(".otherMessage").html((typeof retData.output_data != 'undefined' && retData.output_data.length > 0 ? retData.output_data : me.langMap.apiCallEmptyResultMsg)).append(btnDetailInfo).show();
 
                 btnDetailInfo.click(function() {
                     var detailObj = $(this).next();
@@ -281,4 +280,8 @@ function CreateDetailView(objArray, theme, enableHeader) {
     str += '</tbody>'
     str += '</table>';
     return str;
+}
+
+function onBackKeyDown() {
+    console.log("BackKey Pressed!");
 }
